@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Informe: CRUD con registro, login y roles</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;700&family=Source+Sans+3:wght@400;600&display=swap">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+<main>
+<header>
+  <h1>Informe técnico: sistema CRUD con registro, login y control de roles</h1>
+  <p class="lead">Descripción del funcionamiento de la aplicación, de lo que puede hacer cada tipo de usuario y de las medidas de seguridad que la protegen.</p>
+  <p class="meta">Autor: <em>Ollari Gonzalo</em> &nbsp;|&nbsp; Proyecto fin de año  &nbsp;|&nbsp; 4A</p>
+  <nav aria-label="Contenido">
+    <ul>
+      <li><a href="#intro">Introducción</a></li>
+      <li><a href="#acceso">Registro y login</a></li>
+      <li><a href="#roles">Roles y permisos</a></li>
+      <li><a href="#crud">Operaciones CRUD</a></li>
+      <li><a href="#seguridad">Seguridad</a></li>
+      <li><a href="#conclusion">Conclusión</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section id="intro">
+  <h2>Introducción</h2>
+  <p>Este informe documenta una aplicación web CRUD, es decir, un sistema que permite <strong>crear</strong>, <strong>leer</strong>, <strong>actualizar</strong> y <strong>eliminar</strong> (o archivar) registros almacenados en una base de datos.</p>
+  <p>El acceso está controlado: nadie puede ver ni modificar información sin haberse registrado e iniciado sesión, y las acciones disponibles dependen del rol de cada usuario.</p>
+</section>
+
+<section id="acceso">
+  <h2>Registro e inicio de sesión</h2>
+  <h3>Registro</h3>
+  <p>Una persona nueva completa un formulario con nombre, correo electrónico y contraseña. El sistema valida los datos, comprueba que el correo no esté en uso y guarda la cuenta con el rol <code>usuario</code> por defecto. El rol <code>admin</code> nunca se puede elegir desde el formulario público: lo asigna un administrador existente o se carga directamente en la base de datos.</p>
+  <h3>Login</h3>
+  <p>El flujo de ingreso tiene estos pasos:</p>
+  <ol class="flow">
+    <li>El usuario escribe su correo y su contraseña en el formulario de login.</li>
+    <li>El servidor busca la cuenta y compara la contraseña con el hash almacenado.</li>
+    <li>Si los datos son correctos, crea una sesión y guarda el rol del usuario.</li>
+    <li>Según el rol, el sistema muestra el panel completo (admin) o la vista de solo lectura (usuario).</li>
+    <li>Si los datos son incorrectos, muestra un mensaje genérico y no revela cuál de los dos datos falló.</li>
+  </ol>
+</section>
+
+<section id="roles">
+  <h2>Roles y permisos</h2>
+  <p>Cuando el rol es <strong>admin</strong>, la persona puede ver la tabla con toda la información, editar registros y archivarlos. El usuario común solo puede ingresar y consultar los datos que le corresponden.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Acción</th><th>Usuario</th><th>Admin</th></tr></thead>
+      <tbody>
+        <tr><td>Registrarse e iniciar sesión</td><td><span class="si">Sí</span></td><td><span class="si">Sí</span></td></tr>
+        <tr><td>Ver la tabla con la información</td><td><span class="no">No</span></td><td><span class="si">Sí</span></td></tr>
+        <tr><td>Editar un registro</td><td><span class="no">No</span></td><td><span class="si">Sí</span></td></tr>
+        <tr><td>Archivar un registro</td><td><span class="no">No</span></td><td><span class="si">Sí</span></td></tr>
+        <tr><td>Cerrar sesión</td><td><span class="si">Sí</span></td><td><span class="si">Sí</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Estos permisos se verifican <strong>en el servidor</strong> en cada petición, no solo ocultando botones en la pantalla.</p>
+</section>
+
+<section id="crud">
+  <h2>Operaciones CRUD</h2>
+  <h3>Crear</h3>
+  <p>Se agrega un registro nuevo mediante un formulario. Los datos se validan antes de guardarse.</p>
+  <h3>Leer</h3>
+  <p>El administrador visualiza una tabla con todos los registros. Ejemplo de cómo se vería:</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Ana Pérez</td><td>ana@ejemplo.com</td><td>admin</td><td><span class="si">Activo</span></td><td>Editar · Archivar</td></tr>
+        <tr><td>2</td><td>Luis Gómez</td><td>luis@ejemplo.com</td><td>usuario</td><td><span class="si">Activo</span></td><td>Editar · Archivar</td></tr>
+        <tr><td>3</td><td>Marta Ruiz</td><td>marta@ejemplo.com</td><td>usuario</td><td><span class="arch">Archivado</span></td><td>Editar · Restaurar</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Editar</h3>
+  <p>El administrador modifica los datos de un registro desde un formulario con la información actual ya cargada. Se validan los cambios antes de guardarlos.</p>
+  <h3>Archivar</h3>
+  <p>En lugar de borrar definitivamente un registro, se marca como archivado (<em>borrado lógico</em>, por ejemplo con un campo <code>archivado = 1</code>). Así no se pierde información, se conserva el historial y el registro puede restaurarse si fue un error.</p>
+</section>
+
+<section id="seguridad">
+  <h2>Medidas de seguridad</h2>
+  <div class="sec">
+    <div><h3>Contraseñas con hash</h3><p>Las contraseñas nunca se guardan en texto plano. Se almacenan con un algoritmo de hash lento y con sal, como bcrypt o Argon2, de modo que aunque se filtre la base de datos no se puedan leer.</p></div>
+    <div><h3>Validación en el servidor</h3><p>Todos los datos que llegan se validan y se limpian en el servidor (formato de correo, longitud de la contraseña, campos obligatorios). La validación del navegador sirve para comodidad, pero no se confía en ella.</p></div>
+    <div><h3>Consultas preparadas</h3><p>Las consultas a la base de datos usan parámetros y no concatenan texto del usuario, lo que previene la inyección SQL.</p></div>
+    <div><h3>Control de acceso por rol</h3><p>Cada ruta de edición, archivo y consulta de la tabla comprueba el rol del usuario en el servidor y responde con error de acceso denegado si no es admin. Se aplica el principio de mínimo privilegio.</p></div>
+    <div><h3>Sesiones seguras</h3><p>La sesión se identifica con un token aleatorio, con cookies <code>HttpOnly</code>, <code>Secure</code> y <code>SameSite</code>, con tiempo de expiración y cierre de sesión que la destruye en el servidor.</p></div>
+    <div><h3>Protección contra XSS</h3><p>Todo texto que se muestra en pantalla se escapa para que un nombre o comentario malicioso no pueda ejecutar código en el navegador de otro usuario.</p></div>
+    <div><h3>Protección contra CSRF</h3><p>Los formularios que modifican datos incluyen un token anti-CSRF que el servidor verifica, para que otro sitio no pueda enviar acciones en nombre del administrador.</p></div>
+    <div><h3>Límite de intentos de login</h3><p>Se limita el número de intentos fallidos por usuario o dirección IP para frenar ataques de fuerza bruta, y los mensajes de error no revelan si el correo existe.</p></div>
+    <div><h3>HTTPS y secretos fuera del código</h3><p>La comunicación viaja cifrada con HTTPS. Las claves, contraseñas de la base de datos y otros secretos se guardan en variables de entorno, nunca en el código ni en el repositorio.</p></div>
+  </div>
+</section>
+
+<section id="conclusion">
+  <h2>Conclusión</h2>
+  <p>El sistema combina un CRUD completo con autenticación y autorización por roles: cualquiera puede registrarse, pero solo el administrador accede a la tabla y puede editar y archivar. Las medidas descritas protegen las credenciales, los datos y las acciones sensibles frente a los ataques más comunes.</p>
+</section>
+<footer>Informe elaborado como documentación del proyecto CRUD.</footer>
+</main>
+</body>
+</html>
