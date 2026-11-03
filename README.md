@@ -1,0 +1,1 @@
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/eeab11ce-9b1b-42d4-a08f-b3a436b57da6" />Pagina realizada por Gonzalo Ollari, no se porque me aparece a milagrossilva como contributor, en el la configuracion del usuario desde la terminal (global user) esta puesta mi cuenta.
